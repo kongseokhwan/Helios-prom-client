@@ -63,10 +63,12 @@ func parseInterfaceRxBytes(res string) []StatsObj {
 		tmpResult := strings.Split(vector, "=>")
 
 		tmpLabel := tmpResult[0]
-		tmpVal := strings.Split(tmpResult[1], "\n")
+		//tmpVal := strings.Split(tmpResult[1], "\n")
+		fmt.Printf("KONG Debug :%v\n", tmpResult)
 
 		tmpStatsObj.Label = tmpLabel
-		tmpStatsObj.Vals = tmpVal
+		//tmpStatsObj.Vals = tmpVal
+		tmpStatsObj.Vals = []string{"heelo", "world"}
 
 		statsObjList = append(statsObjList, tmpStatsObj)
 	}
