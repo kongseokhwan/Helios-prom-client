@@ -100,7 +100,7 @@ func exampleAPIQueryRange() {
 		fmt.Printf("Warnings: %v\n", warnings)
 	}
 	resJSON, err := result.Type().MarshalJSON()
-	fmt.Printf("Kong Res : %v", resJSON)
+	fmt.Printf("Kong Res : %s", string(resJSON))
 	/*
 		resSlice := parseInterfaceRxBytes(result.String())
 
