@@ -106,13 +106,15 @@ func exampleAPIQueryRange() {
 		fmt.Printf("Warnings: %v\n", warnings)
 	}
 
-	//fmt.Printf("Kong : %+v\n", queryResult)
-	resSlice := parseInterfaceRxBytes(result.String())
+	fmt.Printf("Kong : %+v\n", result)
+	/*
+		resSlice := parseInterfaceRxBytes(result.String())
 
-	for _, statsObj := range resSlice {
-		fmt.Printf("Labels: %v\n", statsObj.Label)
-		fmt.Printf("Vals: %v\n", statsObj.Vals)
-	}
+		for _, statsObj := range resSlice {
+			fmt.Printf("Labels: %v\n", statsObj.Label)
+			fmt.Printf("Vals: %v\n", statsObj.Vals)
+		}
+	*/
 }
 
 func exampleAPISeries() {
