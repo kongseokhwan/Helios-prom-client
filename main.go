@@ -19,11 +19,17 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/prometheus/client_golang/api"
 	v1 "github.com/prometheus/client_golang/api/prometheus/v1"
 )
+
+type StatsObj struct {
+	Label string
+	Vals  []string
+}
 
 func exampleAPIQuery() {
 	client, err := api.NewClient(api.Config{
@@ -48,10 +54,30 @@ func exampleAPIQuery() {
 	fmt.Printf("Result:\n%v\n", result)
 }
 
+func parseInterfaceRxBytes(res string) []StatsObj {
+	var statsObjList []StatsObj
+
+	parseResult := strings.Split(res, "{")
+	for _, vector := range parseResult {
+		var tmpStatsObj StatsObj
+		tmpResult := strings.Split(vector, "=>")
+
+		tmpLabel := tmpResult[0]
+		tmpVal := strings.Split(tmpResult[1], "\n")
+
+		tmpStatsObj.Label = tmpLabel
+		tmpStatsObj.Vals = tmpVal
+
+		statsObjList = append(statsObjList, tmpStatsObj)
+	}
+	return statsObjList
+}
+
 func exampleAPIQueryRange() {
 	client, err := api.NewClient(api.Config{
 		Address: "http://13.209.193.98:9090",
 	})
+
 	if err != nil {
 		fmt.Printf("Error creating client: %v\n", err)
 		os.Exit(1)
@@ -73,7 +99,12 @@ func exampleAPIQueryRange() {
 	if len(warnings) > 0 {
 		fmt.Printf("Warnings: %v\n", warnings)
 	}
-	fmt.Printf("Result:\n%v\n", result)
+	resSlice := parseInterfaceRxBytes(result.String())
+
+	for _, statsObj := range resSlice {
+		fmt.Printf("Labels: %v\n", statsObj.Label)
+		fmt.Printf("Vals: %v\n", statsObj.Vals)
+	}
 }
 
 func exampleAPISeries() {
