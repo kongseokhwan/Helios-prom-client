@@ -27,7 +27,7 @@ import (
 
 func exampleAPIQuery() {
 	client, err := api.NewClient(api.Config{
-		Address: "http://lb:9090",
+		Address: "http://13.209.193.98:9090",
 	})
 	if err != nil {
 		fmt.Printf("Error creating client: %v\n", err)
@@ -50,7 +50,7 @@ func exampleAPIQuery() {
 
 func exampleAPIQueryRange() {
 	client, err := api.NewClient(api.Config{
-		Address: "http://lb:9090",
+		Address: "http://13.209.193.98:9090",
 	})
 	if err != nil {
 		fmt.Printf("Error creating client: %v\n", err)
@@ -78,7 +78,7 @@ func exampleAPIQueryRange() {
 
 func exampleAPISeries() {
 	client, err := api.NewClient(api.Config{
-		Address: "http://lb:9090",
+		Address: "http://13.209.193.98:9090",
 	})
 	if err != nil {
 		fmt.Printf("Error creating client: %v\n", err)
