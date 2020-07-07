@@ -27,8 +27,9 @@ import (
 )
 
 type StatsObj struct {
-	Label string
-	Vals  []string
+	Label      string
+	Vals       []string
+	TimeSeries []string
 }
 
 func exampleAPIQuery() {
@@ -60,11 +61,15 @@ func parseInterfaceRxBytes(res string) []StatsObj {
 	parseResult := strings.Split(res, "{")[1:]
 	for _, vector := range parseResult {
 		var tmpStatsObj StatsObj
+
+		// Parse Label & Values
 		tmpResult := strings.Split(vector, "=>")
 
+		// Parse Values
 		tmpLabel := tmpResult[0]
 		tmpVal := strings.Split(tmpResult[1], "\n")
 
+		// Parse Values to metric value & timestamp
 		tmpStatsObj.Label = tmpLabel
 		tmpStatsObj.Vals = tmpVal
 
@@ -91,7 +96,8 @@ func exampleAPIQueryRange() {
 		End:   time.Now(),
 		Step:  time.Minute,
 	}
-	result, warnings, queryResult, err := v1api.QueryRangeNew(ctx, "rate(ovs_interface_receive_bytes_total[5m])", r)
+	//result, warnings, queryResult, err := v1api.QueryRangeNew(ctx, "rate(ovs_interface_receive_bytes_total[5m])", r)
+	result, warnings, err := v1api.QueryRange(ctx, "rate(ovs_interface_receive_bytes_total[5m])", r)
 	if err != nil {
 		fmt.Printf("Error querying Prometheus: %v\n", err)
 		os.Exit(1)
@@ -100,7 +106,7 @@ func exampleAPIQueryRange() {
 		fmt.Printf("Warnings: %v\n", warnings)
 	}
 
-	fmt.Printf("Kong : %+v\n", queryResult)
+	//fmt.Printf("Kong : %+v\n", queryResult)
 	resSlice := parseInterfaceRxBytes(result.String())
 
 	for _, statsObj := range resSlice {
