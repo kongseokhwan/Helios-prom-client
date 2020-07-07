@@ -57,18 +57,16 @@ func exampleAPIQuery() {
 func parseInterfaceRxBytes(res string) []StatsObj {
 	var statsObjList []StatsObj
 
-	parseResult := strings.Split(res, "{")
+	parseResult := strings.Split(res, "{")[1:]
 	for _, vector := range parseResult {
 		var tmpStatsObj StatsObj
-		tmpResult := strings.Split(vector, "=>")
+		tmpResult := strings.Split(vector, "=>")[1:]
 
 		tmpLabel := tmpResult[0]
-		//tmpVal := strings.Split(tmpResult[1], "\n")
-		fmt.Printf("KONG Debug :%v\n", tmpResult)
+		tmpVal := strings.Split(tmpResult[1], "\n")
 
 		tmpStatsObj.Label = tmpLabel
-		//tmpStatsObj.Vals = tmpVal
-		tmpStatsObj.Vals = []string{"heelo", "world"}
+		tmpStatsObj.Vals = tmpVal
 
 		statsObjList = append(statsObjList, tmpStatsObj)
 	}
