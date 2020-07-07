@@ -26,6 +26,12 @@ import (
 	v1 "github.com/prometheus/client_golang/api/prometheus/v1"
 )
 
+type TSMetricObj struct {
+	Label      string
+	Vals       []string
+	TimeSeries []string
+}
+
 func exampleAPIQuery() {
 	client, err := api.NewClient(api.Config{
 		Address: "http://13.209.193.98:9090",
@@ -49,7 +55,7 @@ func exampleAPIQuery() {
 	fmt.Printf("Result:\n%v\n", result)
 }
 
-func parseInterfaceRxBytes(res string) map[string][]string {
+func parseMetric(res string) map[string][]string {
 	var keyStr string
 
 	metricMap := make(map[string][]string)
@@ -78,7 +84,9 @@ func parseInterfaceRxBytes(res string) map[string][]string {
 	return metricMap
 }
 
-func exampleAPIQueryRange() {
+func exampleAPIQueryRange(query string) {
+	var queryResult []TSMetricObj
+
 	client, err := api.NewClient(api.Config{
 		Address: "http://13.209.193.98:9090",
 	})
@@ -96,8 +104,8 @@ func exampleAPIQueryRange() {
 		End:   time.Now(),
 		Step:  time.Minute,
 	}
-	//result, warnings, queryResult, err := v1api.QueryRangeNew(ctx, "rate(ovs_interface_receive_bytes_total[5m])", r)
-	result, warnings, err := v1api.QueryRange(ctx, "rate(ovs_interface_receive_bytes_total[5m])", r)
+
+	result, warnings, err := v1api.QueryRange(ctx, query, r)
 	if err != nil {
 		fmt.Printf("Error querying Prometheus: %v\n", err)
 		os.Exit(1)
@@ -106,11 +114,19 @@ func exampleAPIQueryRange() {
 		fmt.Printf("Warnings: %v\n", warnings)
 	}
 
-	resSlice := parseInterfaceRxBytes(result.String())
+	resMetric := parseMetric(result.String())
 
-	for key, val := range resSlice {
-		fmt.Printf("Key: %s\n", key)
-		fmt.Printf("Vals: %v\n", val)
+	for key, val := range resMetric {
+		var metricObj TSMetricObj
+		metricObj.Label = key
+		for i, v := range val {
+			if i > 0 {
+				metricList := strings.Fields(v)
+				metricObj.Vals = append(metricObj.Vals, metricList[0])
+				metricObj.TimeSeries = append(metricObj.TimeSeries, metricList[1])
+			}
+		}
+		queryResult = append(queryResult, metricObj)
 	}
 }
 
@@ -143,5 +159,5 @@ func exampleAPISeries() {
 }
 
 func main() {
-	exampleAPIQueryRange()
+	exampleAPIQueryRange("rate(ovs_interface_receive_bytes_total[5m])")
 }
