@@ -100,7 +100,7 @@ func exampleAPIQueryRange() {
 		fmt.Printf("Warnings: %v\n", warnings)
 	}
 
-	fmt.Printf("Kong : %v\n", queryResult.Result)
+	fmt.Printf("Kong : %+v\n", queryResult)
 	resSlice := parseInterfaceRxBytes(result.String())
 
 	for _, statsObj := range resSlice {
