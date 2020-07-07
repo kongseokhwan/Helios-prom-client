@@ -65,7 +65,7 @@ func exampleAPIQueryRange() {
 		End:   time.Now(),
 		Step:  time.Minute,
 	}
-	result, warnings, err := v1api.QueryRange(ctx, "rate(ovs_interface_receive_bytes_total[5m])*8)", r)
+	result, warnings, err := v1api.QueryRange(ctx, "rate(ovs_interface_receive_bytes_total[5m])", r)
 	if err != nil {
 		fmt.Printf("Error querying Prometheus: %v\n", err)
 		os.Exit(1)
