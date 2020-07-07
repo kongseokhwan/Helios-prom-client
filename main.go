@@ -91,7 +91,7 @@ func exampleAPIQueryRange() {
 		End:   time.Now(),
 		Step:  time.Minute,
 	}
-	result, warnings, err := v1api.QueryRange(ctx, "rate(ovs_interface_receive_bytes_total[5m])", r)
+	result, warnings, queryResult, err := v1api.QueryRangeNew(ctx, "rate(ovs_interface_receive_bytes_total[5m])", r)
 	if err != nil {
 		fmt.Printf("Error querying Prometheus: %v\n", err)
 		os.Exit(1)
@@ -99,16 +99,14 @@ func exampleAPIQueryRange() {
 	if len(warnings) > 0 {
 		fmt.Printf("Warnings: %v\n", warnings)
 	}
-	resJSON, err := result.Type().MarshalJSON()
-	fmt.Printf("Kong Res : %s", string(resJSON))
-	/*
-		resSlice := parseInterfaceRxBytes(result.String())
 
-		for _, statsObj := range resSlice {
-			fmt.Printf("Labels: %v\n", statsObj.Label)
-			fmt.Printf("Vals: %v\n", statsObj.Vals)
-		}
-	*/
+	fmt.Printf("Kong : %v", queryResult)
+	resSlice := parseInterfaceRxBytes(result.String())
+
+	for _, statsObj := range resSlice {
+		fmt.Printf("Labels: %v\n", statsObj.Label)
+		fmt.Printf("Vals: %v\n", statsObj.Vals)
+	}
 }
 
 func exampleAPISeries() {
