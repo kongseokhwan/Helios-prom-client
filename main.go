@@ -60,7 +60,7 @@ func parseInterfaceRxBytes(res string) []StatsObj {
 	parseResult := strings.Split(res, "{")[1:]
 	for _, vector := range parseResult {
 		var tmpStatsObj StatsObj
-		tmpResult := strings.Split(vector, "=>")[1:]
+		tmpResult := strings.Split(vector, "=>")
 
 		tmpLabel := tmpResult[0]
 		tmpVal := strings.Split(tmpResult[1], "\n")
