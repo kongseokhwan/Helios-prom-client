@@ -26,12 +26,6 @@ import (
 	v1 "github.com/prometheus/client_golang/api/prometheus/v1"
 )
 
-type StatsObj struct {
-	Label      string
-	Vals       []string
-	TimeSeries []string
-}
-
 func exampleAPIQuery() {
 	client, err := api.NewClient(api.Config{
 		Address: "http://13.209.193.98:9090",
@@ -55,27 +49,33 @@ func exampleAPIQuery() {
 	fmt.Printf("Result:\n%v\n", result)
 }
 
-func parseInterfaceRxBytes(res string) []StatsObj {
-	var statsObjList []StatsObj
+func parseInterfaceRxBytes(res string) map[string][]string {
+	var keyStr string
 
-	parseResult := strings.Split(res, "{")[1:]
-	for _, vector := range parseResult {
-		var tmpStatsObj StatsObj
+	metricMap := make(map[string][]string)
+	repTimestamp := strings.NewReplacer(
+		"[", "",
+		"]", "",
+		"@", "")
 
-		// Parse Label & Values
-		tmpResult := strings.Split(vector, "=>")
+	res = strings.Replace(res, "=>", "", -1)
+	testTmp1 := strings.Split(res, "\n")
 
-		// Parse Values
-		tmpLabel := tmpResult[0]
-		tmpVal := strings.Split(tmpResult[1], "\n")
-
-		// Parse Values to metric value & timestamp
-		tmpStatsObj.Label = tmpLabel
-		tmpStatsObj.Vals = tmpVal
-
-		statsObjList = append(statsObjList, tmpStatsObj)
+	for _, line := range testTmp1 {
+		if strings.Contains(line, "{") {
+			keyStr = line
+			metricMap[keyStr] = []string{""}
+		} else {
+			line = repTimestamp.Replace(line)
+			metricMap[keyStr] = append(metricMap[keyStr], line)
+		}
 	}
-	return statsObjList
+
+	for key, val := range metricMap {
+		fmt.Printf("key: %s, val: %s\n", key, val)
+	}
+
+	return metricMap
 }
 
 func exampleAPIQueryRange() {
@@ -106,15 +106,12 @@ func exampleAPIQueryRange() {
 		fmt.Printf("Warnings: %v\n", warnings)
 	}
 
-	fmt.Printf("Kong : %+v\n", result)
-	/*
-		resSlice := parseInterfaceRxBytes(result.String())
+	resSlice := parseInterfaceRxBytes(result.String())
 
-		for _, statsObj := range resSlice {
-			fmt.Printf("Labels: %v\n", statsObj.Label)
-			fmt.Printf("Vals: %v\n", statsObj.Vals)
-		}
-	*/
+	for key, val := range resSlice {
+		fmt.Printf("Key: %s\n", key)
+		fmt.Printf("Vals: %v\n", val)
+	}
 }
 
 func exampleAPISeries() {
