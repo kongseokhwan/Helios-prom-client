@@ -85,6 +85,8 @@ func exampleAPIQuery(query string) {
 		fmt.Printf("Warnings: %v\n", warnings)
 	}
 
+	fmt.Printf("Result Strnings: %v\n", result)
+
 	resMetric := parseMetric(result.String())
 
 	for key, val := range resMetric {
@@ -186,5 +188,5 @@ func main() {
 	exampleAPIQuery("topk(5, avg by (bridge, port)(rate(ovs_interface_receive_bytes_total[5m])*8))")
 
 	fmt.Println("avg Function ======================================")
-	exampleAPIQueryRange("avg by(bridge, port) (rate(ovs_interface_receive_bytes_total[5m])*8))")
+	exampleAPIQueryRange("avg by(bridge, port) (rate(ovs_interface_receive_bytes_total[5m])*8)")
 }
