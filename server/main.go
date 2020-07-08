@@ -9,13 +9,13 @@ import (
 	"github.com/gorilla/mux"
 )
 
-const HOST string{"15.165.203.82"}
-const PORT string{"9090"}
-const VERSION string{"v1"}
+const HOST string = "15.165.203.82"
+const PORT string = "9090"
+const VERSION string = "v1"
 
-const PARAMMETRIC string{"metricID"}
-const PARAMRANK string{"rankID"}
-const PARAMDURATION string{"durationID"}
+const PARAMMETRIC string = "metricID"
+const PARAMRANK string = "rankID"
+const PARAMDURATION string = "durationID"
 
 func getCountAPIQuery(w http.ResponseWriter, r *http.Request) {
 	c, err := ovs_prom_client.NewOVSPClilent(HOST, PORT, VERSION)
