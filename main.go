@@ -160,5 +160,13 @@ func exampleAPISeries() {
 }
 
 func main() {
-	exampleAPIQueryRange("rate(ovs_interface_receive_bytes_total[5m])")
+	//exampleAPIQueryRange("rate(ovs_interface_receive_bytes_total[5m])")
+	fmt.Println("Count Function ======================================")
+	exampleAPIQueryRange("count (count by (bridge, port) (ovs_interface_receive_bytes_total))")
+
+	fmt.Println("nTop Function ======================================")
+	exampleAPIQueryRange("topk(5, avg by (bridge, port)(rate(ovs_interface_receive_bytes_total[5m])*8))")
+
+	fmt.Println("avg Function ======================================")
+	exampleAPIQueryRange("avg by(bridge, port) (rate(ovs_interface_receive_bytes_total[5m])*8))")
 }
