@@ -41,6 +41,8 @@ func parseSingleMetric(res string) map[string][]string {
 		"@", "")
 
 	res = repTimestamp.Replace(res)
+
+	metricMap["new"] = []string{""}
 	metricMap["new"] = append(metricMap["new"], res)
 
 	return metricMap
