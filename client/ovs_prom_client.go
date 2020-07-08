@@ -21,7 +21,7 @@ import (
 	"os"
 	"strings"
 	"time"
-	"ovs_prom_ctx"
+	"github.com/kongseokhwan/Helios-prom-client/client/ovs_prom_ctx"
 
 	"github.com/prometheus/client_golang/api"
 	v1 "github.com/prometheus/client_golang/api/prometheus/v1"
