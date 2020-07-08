@@ -34,7 +34,7 @@ type TSMetricObj struct {
 
 func exampleAPIQuery() {
 	client, err := api.NewClient(api.Config{
-		Address: "http://13.209.193.98:9090",
+		Address: "http://15.165.203.82:9090",
 	})
 	if err != nil {
 		fmt.Printf("Error creating client: %v\n", err)
@@ -88,7 +88,7 @@ func exampleAPIQueryRange(query string) {
 	var queryResult []TSMetricObj
 
 	client, err := api.NewClient(api.Config{
-		Address: "http://13.209.193.98:9090",
+		Address: "http://15.165.203.82:9090",
 	})
 
 	if err != nil {
@@ -124,6 +124,7 @@ func exampleAPIQueryRange(query string) {
 				metricList := strings.Fields(v)
 				metricObj.Vals = append(metricObj.Vals, metricList[0])
 				metricObj.TimeSeries = append(metricObj.TimeSeries, metricList[1])
+				fmt.Printf("Val: %s, Time : %s \n", metricList[0], metricList[1])
 			}
 		}
 		queryResult = append(queryResult, metricObj)
@@ -132,7 +133,7 @@ func exampleAPIQueryRange(query string) {
 
 func exampleAPISeries() {
 	client, err := api.NewClient(api.Config{
-		Address: "http://13.209.193.98:9090",
+		Address: "http://15.165.203.82:9090",
 	})
 	if err != nil {
 		fmt.Printf("Error creating client: %v\n", err)

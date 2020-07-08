@@ -21,7 +21,7 @@ import (
 	"os"
 	"strings"
 	"time"
-	"github.com/kongseokhwan/Helios-prom-client/client/ovs_prom_ctx"
+	"github.com/kongseokhwan/Helios-prom-client/client"
 
 	"github.com/prometheus/client_golang/api"
 	v1 "github.com/prometheus/client_golang/api/prometheus/v1"
@@ -202,9 +202,3 @@ func (c *OVSClient) avgbyQueryWithRate(metric string, duration string) ([]TSMetr
 	// Call ovsAPIQueryRange() & return result
 	return ovsAPIQueryRange(c.Host, c.Port, query)
 }
-
-/*
-func main() {
-	ovsAPIQueryRange("rate(ovs_interface_receive_bytes_total[5m])")
-}
-*/
