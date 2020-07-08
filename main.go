@@ -32,6 +32,20 @@ type TSMetricObj struct {
 	TimeSeries []string
 }
 
+func parseSingleMetric(res string) map[string][]string {
+	metricMap := make(map[string][]string)
+	res = strings.Split(res, "=>")[1]
+	repTimestamp := strings.NewReplacer(
+		"[", "",
+		"]", "",
+		"@", "")
+
+	res = repTimestamp.Replace(res)
+	metricMap["new"] = append(metricMap["new"], res)
+
+	return metricMap
+}
+
 func parseMetric(res string) map[string][]string {
 	var keyStr string
 
@@ -87,7 +101,7 @@ func exampleAPIQuery(query string) {
 
 	fmt.Printf("Result Strnings: %v\n", result)
 
-	resMetric := parseMetric(result.String())
+	resMetric := parseSingleMetric(result.String())
 
 	for key, val := range resMetric {
 		var metricObj TSMetricObj
