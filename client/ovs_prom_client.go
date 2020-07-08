@@ -22,6 +22,7 @@ import (
 	"time"
 
 	"github.com/prometheus/client_golang/api"
+	ovs_prom_ctx "github.com/kongseokhwan/Helios-prom-client/client"
 	v1 "github.com/prometheus/client_golang/api/prometheus/v1"
 	"github.com/prometheus/common/log"
 )
@@ -266,6 +267,7 @@ func groupbyAPIQueryRange(host string, port int, query string) ([]TSMetricObj, e
 
 func (c *OVSClient) ntopQueryWithRate(rankSize string, metric string, duration string) ([]TSMetricObj, error) {
 	// Make Query String
+	ovs_prom_ctx.
 	query := fmt.Sprintf(ovs_prom_ctx.ntopQueryWithRate, rankSize, metric, duration)
 
 	// Call ovsAPIQueryRange() & return result
