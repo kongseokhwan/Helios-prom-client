@@ -22,10 +22,27 @@ import (
 	"time"
 
 	"github.com/prometheus/client_golang/api"
-	ovs_prom_ctx "github.com/kongseokhwan/Helios-prom-client/client"
 	v1 "github.com/prometheus/client_golang/api/prometheus/v1"
 	"github.com/prometheus/common/log"
 )
+
+const OVS_INTERFACE_RECEIVE_BYTES_TOTAL string = "ovs_interface_receive_bytes_total"
+const OVS_INTERFACE_RECEIVE_CRC_TOTAL string = "ovs_interface_receive_crc_total"
+const OVS_INTERFACE_RECEIVE_DROP_TOTAL string = "ovs_interface_receive_drop_total"
+const OVS_INTERFACE_RECEIVE_ERRORS_TOTAL string = "ovs_interface_receive_errors_total"
+const OVS_INTERFACE_RECEIVE_PACKETS_TOTAL string = "ovs_interface_receive_packets_total"
+const OVS_INTERFACE_TRANSMIT_BYTES_TOTAL string = "ovs_interface_transmit_bytes_total"
+const OVS_INTERFACE_TRANSMIT_COLLISIONS_TOTAL string = "ovs_interface_transmit_collisionss_total"
+const OVS_INTERFACE_TRANSMIT_DROP_TOTAL string = "ovs_interface_transmit_drop_total"
+const OVS_INTERFACE_TRANSMIT_ERRORS_TOTAL string = "ovs_interface_transmit_errors_total"
+const OVS_INTERFACE_TRANSMIT_PACKETS_TOTAL string = "ovs_interface_transmit_packeets_total"
+
+const OVS_FLOW_FLOW_BYTES_TOTAL string = "ovs_flow_flow_bytes_total"
+const OVS_FLOW_FLOW_PACKETS_TOTAL string = "ovs_flow_flow_packets_total"
+
+const ntopQueryWithRate string = "topk(%s, avg by (bridge, port)(rate(%s[%s])*8))" // rankSize, metric, duration
+const countQuery string = "count(count by (bridge, port)(%s)"                      // metric
+const avgbyQueryWithRate string = "avg by(bridge, port) (rate(%s[%s])*8)"          // metric, duration
 
 type TSMetricObj struct {
 	Label      string
@@ -267,8 +284,7 @@ func groupbyAPIQueryRange(host string, port int, query string) ([]TSMetricObj, e
 
 func (c *OVSClient) ntopQueryWithRate(rankSize string, metric string, duration string) ([]TSMetricObj, error) {
 	// Make Query String
-	ovs_prom_ctx.
-	query := fmt.Sprintf(ovs_prom_ctx.ntopQueryWithRate, rankSize, metric, duration)
+	query := fmt.Sprintf(ntopQueryWithRate, rankSize, metric, duration)
 
 	// Call ovsAPIQueryRange() & return result
 	return topkAPIQuery(c.Host, c.Port, query)
@@ -276,7 +292,7 @@ func (c *OVSClient) ntopQueryWithRate(rankSize string, metric string, duration s
 
 func (c *OVSClient) countQuery(metric string) ([]TSMetricObj, error) {
 	// Make Query String
-	query := fmt.Sprintf(ovs_prom_ctx.countQuery, metric)
+	query := fmt.Sprintf(countQuery, metric)
 
 	// Call ovsAPIQueryRange() & return result
 	return countAPIQuery(c.Host, c.Port, query)
@@ -284,7 +300,7 @@ func (c *OVSClient) countQuery(metric string) ([]TSMetricObj, error) {
 
 func (c *OVSClient) avgbyQueryWithRate(metric string, duration string) ([]TSMetricObj, error) {
 	// Make Query String
-	query := fmt.Sprintf(ovs_prom_ctx.avgbyQueryWithRate, metric, duration)
+	query := fmt.Sprintf(avgbyQueryWithRate, metric, duration)
 
 	// Call ovsAPIQueryRange() & return result
 	return groupbyAPIQueryRange(c.Host, c.Port, query)
