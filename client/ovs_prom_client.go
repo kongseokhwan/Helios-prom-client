@@ -18,13 +18,12 @@ package ovs_prom_client
 import (
 	"context"
 	"fmt"
-	"os"
 	"strings"
 	"time"
-	"github.com/kongseokhwan/Helios-prom-client/client"
 
 	"github.com/prometheus/client_golang/api"
 	v1 "github.com/prometheus/client_golang/api/prometheus/v1"
+	"github.com/prometheus/common/log"
 )
 
 type TSMetricObj struct {
@@ -34,17 +33,17 @@ type TSMetricObj struct {
 }
 
 type OVSClient struct {
-	Host 		string
-	Port		int
-	Version		string
+	Host    string
+	Port    int
+	Version string
 }
 
-func NewOVSPClilent(opts Options) (*OVSClient, error) {
+func NewOVSPClilent(host string, port string, version string) (*OVSClient, error) {
 	// TODO: opts validation check
 
 	c := OVSClient{
-		Host: opts.Host,
-		Port: opts.Port,
+		Host:    opts.Host,
+		Port:    opts.Port,
 		Version: opts.Version,
 	}
 
