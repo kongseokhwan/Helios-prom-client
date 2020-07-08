@@ -1,4 +1,4 @@
-package ovspromctx
+package ovs_prom_ctx
 
 const OVS_INTERFACE_RECEIVE_BYTES_TOTAL = "ovs_interface_receive_bytes_total"
 const OVS_INTERFACE_RECEIVE_CRC_TOTAL = "ovs_interface_receive_crc_total"
