@@ -32,29 +32,6 @@ type TSMetricObj struct {
 	TimeSeries []string
 }
 
-func exampleAPIQuery() {
-	client, err := api.NewClient(api.Config{
-		Address: "http://15.165.203.82:9090",
-	})
-	if err != nil {
-		fmt.Printf("Error creating client: %v\n", err)
-		os.Exit(1)
-	}
-
-	v1api := v1.NewAPI(client)
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
-	result, warnings, err := v1api.Query(ctx, "up", time.Now())
-	if err != nil {
-		fmt.Printf("Error querying Prometheus: %v\n", err)
-		os.Exit(1)
-	}
-	if len(warnings) > 0 {
-		fmt.Printf("Warnings: %v\n", warnings)
-	}
-	fmt.Printf("Result:\n%v\n", result)
-}
-
 func parseMetric(res string) map[string][]string {
 	var keyStr string
 
@@ -82,6 +59,47 @@ func parseMetric(res string) map[string][]string {
 	}
 
 	return metricMap
+}
+
+func exampleAPIQuery(query string) {
+	var queryResult []TSMetricObj
+
+	client, err := api.NewClient(api.Config{
+		Address: "http://15.165.203.82:9090",
+	})
+	if err != nil {
+		fmt.Printf("Error creating client: %v\n", err)
+		os.Exit(1)
+	}
+
+	v1api := v1.NewAPI(client)
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	//result, warnings, err := v1api.Query(ctx, "up", time.Now())
+	result, warnings, err := v1api.Query(ctx, query, time.Now())
+	if err != nil {
+		fmt.Printf("Error querying Prometheus: %v\n", err)
+		os.Exit(1)
+	}
+	if len(warnings) > 0 {
+		fmt.Printf("Warnings: %v\n", warnings)
+	}
+
+	resMetric := parseMetric(result.String())
+
+	for key, val := range resMetric {
+		var metricObj TSMetricObj
+		metricObj.Label = key
+		for i, v := range val {
+			if i > 0 {
+				metricList := strings.Fields(v)
+				metricObj.Vals = append(metricObj.Vals, metricList[0])
+				metricObj.TimeSeries = append(metricObj.TimeSeries, metricList[1])
+				fmt.Printf("Val: %s, Time : %s \n", metricList[0], metricList[1])
+			}
+		}
+		queryResult = append(queryResult, metricObj)
+	}
 }
 
 func exampleAPIQueryRange(query string) {
@@ -162,10 +180,10 @@ func exampleAPISeries() {
 func main() {
 	//exampleAPIQueryRange("rate(ovs_interface_receive_bytes_total[5m])")
 	fmt.Println("Count Function ======================================")
-	exampleAPIQueryRange("count (count by (bridge, port) (ovs_interface_receive_bytes_total))")
+	exampleAPIQuery("count (count by (bridge, port) (ovs_interface_receive_bytes_total))")
 
 	fmt.Println("nTop Function ======================================")
-	exampleAPIQueryRange("topk(5, avg by (bridge, port)(rate(ovs_interface_receive_bytes_total[5m])*8))")
+	exampleAPIQuery("topk(5, avg by (bridge, port)(rate(ovs_interface_receive_bytes_total[5m])*8))")
 
 	fmt.Println("avg Function ======================================")
 	exampleAPIQueryRange("avg by(bridge, port) (rate(ovs_interface_receive_bytes_total[5m])*8))")
