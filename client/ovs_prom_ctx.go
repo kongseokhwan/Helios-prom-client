@@ -17,7 +17,3 @@ const OVS_FLOW_FLOW_PACKETS_TOTAL = "ovs_flow_flow_packets_total"
 const ntopQueryWithRate = "topk(%s, avg by (bridge, port)(rate(%s[%s])*8))" // rankSize, metric, duration
 const countQuery = "count(count by (bridge, port)(%s)"                      // metric
 const avgbyQueryWithRate = "avg by(bridge, port) (rate(%s[%s])*8)"          // metric, duration
-
-
-
-func ovsAPIQueryRange(host string, port int, query string) ([]TSMetricObj, error) {
