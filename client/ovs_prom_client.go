@@ -52,7 +52,54 @@ func NewOVSPClilent(opts Options) (*OVSClient, error) {
 	return &c, nil
 }
 
-func parseMetric(res string) map[string][]string {
+func parseCountMetric(res string) map[string][]string {
+	metricMap := make(map[string][]string)
+	res = strings.Split(res, "=>")[1]
+	repTimestamp := strings.NewReplacer(
+		"[", "",
+		"]", "",
+		"@", "")
+
+	res = repTimestamp.Replace(res)
+
+	metricMap["count"] = []string{""}
+	metricMap["count"] = append(metricMap["count"], res)
+
+	return metricMap
+}
+
+func parseTopkMetric(res string) map[string][]string {
+	var keyStr string
+
+	metricMap := make(map[string][]string)
+	repTimestamp := strings.NewReplacer(
+		"[", "",
+		"]", "",
+		"@", "",
+		"{", "",
+		"}", "",
+	)
+
+	testTmp1 := strings.Split(res, "\n")
+
+	for _, line := range testTmp1 {
+		metricStr := strings.Split(line, "=>")
+
+		keyStr = repTimestamp.Replace(metricStr[0])
+		valStr := repTimestamp.Replace(metricStr[1])
+
+		metricMap[keyStr] = []string{""}
+		metricMap[keyStr] = append(metricMap[keyStr], valStr)
+	}
+
+	for key, val := range metricMap {
+		fmt.Printf("key: %s, val: %s\n", key, val)
+	}
+
+	return metricMap
+}
+
+func parseGroupByMetric(res string) map[string][]string {
 	var keyStr string
 
 	metricMap := make(map[string][]string)
@@ -81,7 +128,96 @@ func parseMetric(res string) map[string][]string {
 	return metricMap
 }
 
-func ovsAPIQueryRange(host string, port int, query string) ([]TSMetricObj, error) {
+func countAPIQuery(host string, port int, query string) ([]TSMetricObj, error) {
+	var queryResult []TSMetricObj
+
+	client, err := api.NewClient(api.Config{
+		Address: fmt.Sprint("http://%s:%s", host, port),
+	})
+	if err != nil {
+		fmt.Printf("Error creating client: %v\n", err)
+		return nil, err
+	}
+
+	v1api := v1.NewAPI(client)
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	result, warnings, err := v1api.Query(ctx, query, time.Now())
+	if err != nil {
+		fmt.Printf("Error querying Prometheus: %v\n", err)
+		return nil, err
+	}
+	if len(warnings) > 0 {
+		fmt.Printf("Warnings: %v\n", warnings)
+	}
+
+	fmt.Printf("Result Strnings: %v\n", result)
+
+	resMetric := parseCountMetric(result.String())
+
+	for key, val := range resMetric {
+		var metricObj TSMetricObj
+		metricObj.Label = key
+		for i, v := range val {
+			if i > 0 {
+				metricList := strings.Fields(v)
+				metricObj.Vals = append(metricObj.Vals, metricList[0])
+				metricObj.TimeSeries = append(metricObj.TimeSeries, metricList[1])
+				fmt.Printf("Val: %s, Time : %s \n", metricList[0], metricList[1])
+			}
+		}
+		queryResult = append(queryResult, metricObj)
+	}
+	return queryResult, err
+}
+
+func topkAPIQuery(host string, port int, query string) ([]TSMetricObj, error) {
+	var queryResult []TSMetricObj
+
+	client, err := api.NewClient(api.Config{
+		Address: fmt.Sprint("http://%s:%s", host, port),
+	})
+	if err != nil {
+		fmt.Printf("Error creating client: %v\n", err)
+		return nil, err
+	}
+
+	v1api := v1.NewAPI(client)
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	result, warnings, err := v1api.Query(ctx, query, time.Now())
+	if err != nil {
+		fmt.Printf("Error querying Prometheus: %v\n", err)
+		return nil, err
+	}
+	if len(warnings) > 0 {
+		fmt.Printf("Warnings: %v\n", warnings)
+	}
+
+	fmt.Printf("Result Strnings: %v\n", result)
+
+	resMetric := parseTopkMetric(result.String())
+
+	for key, val := range resMetric {
+		var metricObj TSMetricObj
+		metricObj.Label = key
+		for i, v := range val {
+			if i > 0 {
+				metricList := strings.Fields(v)
+				metricObj.Vals = append(metricObj.Vals, metricList[0])
+				metricObj.TimeSeries = append(metricObj.TimeSeries, metricList[1])
+				fmt.Printf("Val: %s, Time : %s \n", metricList[0], metricList[1])
+			}
+		}
+		queryResult = append(queryResult, metricObj)
+	}
+
+	return queryResult, nil
+}
+
+func groupbyAPIQueryRange(host string, port int, query string) ([]TSMetricObj, error) {
 	var queryResult []TSMetricObj
 
 	client, err := api.NewClient(api.Config{
@@ -111,7 +247,7 @@ func ovsAPIQueryRange(host string, port int, query string) ([]TSMetricObj, error
 		fmt.Printf("Warnings: %v\n", warnings)
 	}
 
-	resMetric := parseMetric(result.String())
+	resMetric := parseGroupByMetric(result.String())
 
 	for key, val := range resMetric {
 		var metricObj TSMetricObj
@@ -121,6 +257,7 @@ func ovsAPIQueryRange(host string, port int, query string) ([]TSMetricObj, error
 				metricList := strings.Fields(v)
 				metricObj.Vals = append(metricObj.Vals, metricList[0])
 				metricObj.TimeSeries = append(metricObj.TimeSeries, metricList[1])
+				fmt.Printf("Val: %s, Time : %s \n", metricList[0], metricList[1])
 			}
 		}
 		queryResult = append(queryResult, metricObj)
@@ -128,63 +265,12 @@ func ovsAPIQueryRange(host string, port int, query string) ([]TSMetricObj, error
 	return queryResult, nil
 }
 
-func exampleAPIQuery() {
-	client, err := api.NewClient(api.Config{
-		Address: "http://13.209.193.98:9090",
-	})
-	if err != nil {
-		fmt.Printf("Error creating client: %v\n", err)
-		os.Exit(1)
-	}
-
-	v1api := v1.NewAPI(client)
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
-	result, warnings, err := v1api.Query(ctx, "up", time.Now())
-	if err != nil {
-		fmt.Printf("Error querying Prometheus: %v\n", err)
-		os.Exit(1)
-	}
-	if len(warnings) > 0 {
-		fmt.Printf("Warnings: %v\n", warnings)
-	}
-	fmt.Printf("Result:\n%v\n", result)
-}
-
-func exampleAPISeries() {
-	client, err := api.NewClient(api.Config{
-		Address: "http://13.209.193.98:9090",
-	})
-	if err != nil {
-		fmt.Printf("Error creating client: %v\n", err)
-		os.Exit(1)
-	}
-
-	v1api := v1.NewAPI(client)
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
-	lbls, warnings, err := v1api.Series(ctx, []string{
-		"{__name__=\"ovs_flow_flow_bytes_total\", job=\"prometheus\"}",
-	}, time.Now().Add(-time.Hour), time.Now())
-	if err != nil {
-		fmt.Printf("Error querying Prometheus: %v\n", err)
-		os.Exit(1)
-	}
-	if len(warnings) > 0 {
-		fmt.Printf("Warnings: %v\n", warnings)
-	}
-	fmt.Println("Result:")
-	for _, lbl := range lbls {
-		fmt.Println(lbl)
-	}
-}
-
 func (c *OVSClient) ntopQueryWithRate(rankSize string, metric string, duration string) ([]TSMetricObj, error) {
 	// Make Query String
 	query := fmt.Sprintf(ovs_prom_ctx.ntopQueryWithRate, rankSize, metric, duration)
 
 	// Call ovsAPIQueryRange() & return result
-	return ovsAPIQueryRange(c.Host, c.Port, query)
+	return topkAPIQuery(c.Host, c.Port, query)
 }
 
 func (c *OVSClient) countQuery(metric string) ([]TSMetricObj, error) {
@@ -192,7 +278,7 @@ func (c *OVSClient) countQuery(metric string) ([]TSMetricObj, error) {
 	query := fmt.Sprintf(ovs_prom_ctx.countQuery, metric)
 
 	// Call ovsAPIQueryRange() & return result
-	return ovsAPIQueryRange(c.Host, c.Port, query)
+	return countAPIQuery(c.Host, c.Port, query)
 }
 
 func (c *OVSClient) avgbyQueryWithRate(metric string, duration string) ([]TSMetricObj, error) {
@@ -200,5 +286,5 @@ func (c *OVSClient) avgbyQueryWithRate(metric string, duration string) ([]TSMetr
 	query := fmt.Sprintf(ovs_prom_ctx.avgbyQueryWithRate, metric, duration)
 
 	// Call ovsAPIQueryRange() & return result
-	return ovsAPIQueryRange(c.Host, c.Port, query)
+	return groupbyAPIQueryRange(c.Host, c.Port, query)
 }
