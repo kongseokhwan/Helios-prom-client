@@ -46,9 +46,9 @@ const avgbyQueryWithRate string = "avg by(bridge, port) (rate(%s[%s])*8)"       
 
 // TSMetricObj struct is response structutre of metric query
 type TSMetricObj struct {
-	Label      string
-	Vals       []string
-	TimeSeries []string
+	Label      string   `jsong:"label"`
+	Vals       []string `jsong:"vals"`
+	TimeSeries []string `jsong:"timeseries"`
 }
 
 // OVSClient struct is client for interconnection with prometheus server

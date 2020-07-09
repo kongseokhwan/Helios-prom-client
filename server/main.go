@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
@@ -28,6 +29,11 @@ const PARAMRANK string = "rankID"
 // PARAMDURATION is duration parameter
 const PARAMDURATION string = "durationID"
 
+// TSMetrics is JSON response struct
+type TSMetrics struct {
+	Metrics []ovs_prom_client.TSMetricObj `json:"metrics"`
+}
+
 func getCountAPIQuery(w http.ResponseWriter, r *http.Request) {
 	c, err := ovs_prom_client.NewOVSPClilent(HOST, PORT, VERSION)
 	pathParams := mux.Vars(r)
@@ -50,7 +56,22 @@ func getCountAPIQuery(w http.ResponseWriter, r *http.Request) {
 		3. Marsha JSON
 	*/
 
-	w.Write([]byte(`{"message": "get called"}`))
+	queryResult, err := c.CountQuery(metricID)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(`{"message": "error to get CountQuery"}`))
+		return
+	}
+
+	queryResult = &TSMetrics{Metrics: queryResult}
+
+	resp, err := json.MarshalIndent(queryResult, "", "\t\t")
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(`{"message": "error to marshal JSON"}`))
+		return
+	}
+	w.Write(resp)
 }
 
 func getTopkAPIQuery(w http.ResponseWriter, r *http.Request) {
@@ -91,7 +112,23 @@ func getTopkAPIQuery(w http.ResponseWriter, r *http.Request) {
 		2. Call OVSClient API : ntopQueryWithRate(rankSize string, metric string, duration string) ([]TSMetricObj, error)
 		3. Marsha JSON
 	*/
-	w.Write([]byte(`{"message": "get called"}`))
+
+	queryResult, err := c.NtopQueryWithRate(rankID, metricID, durationID)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(`{"message": "error to get NtopQueryWithRate"}`))
+		return
+	}
+
+	queryResult = &TSMetrics{Metrics: queryResult}
+
+	resp, err := json.MarshalIndent(queryResult, "", "\t\t")
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(`{"message": "error to marshal JSON"}`))
+		return
+	}
+	w.Write(resp)
 }
 
 func getGroupbyAPIQueryRange(w http.ResponseWriter, r *http.Request) {
@@ -122,7 +159,22 @@ func getGroupbyAPIQueryRange(w http.ResponseWriter, r *http.Request) {
 		2. Call OVSClient API : avgbyQueryWithRate(metric string, duration string) ([]TSMetricObj, error)
 		3. Marsha JSON
 	*/
-	w.Write([]byte(`{"message": "get called"}`))
+	queryResult, err := c.AvgbyQueryWithRate(metricID, durationID)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(`{"message": "error to get AvgbyQueryWithRate"}`))
+		return
+	}
+
+	queryResult = &TSMetrics{Metrics: queryResult}
+
+	resp, err := json.MarshalIndent(queryResult, "", "\t\t")
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(`{"message": "error to marshal JSON"}`))
+		return
+	}
+	w.Write(resp)
 }
 
 func post(w http.ResponseWriter, r *http.Request) {
