@@ -34,12 +34,11 @@ func getCountAPIQuery(w http.ResponseWriter, r *http.Request) {
 	metricID := ""
 
 	if val, ok := pathParams[PARAMMETRIC]; ok {
-		metricID, err = strconv.Atoi(val)
-		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			w.Write([]byte(`{"message": "need a number"}`))
-			return
-		}
+		metricID = val
+	} else {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(`{"message": "need a number"}`))
+		return
 	}
 
 	w.Header().Set("Content-Type", "application/json")
@@ -50,6 +49,7 @@ func getCountAPIQuery(w http.ResponseWriter, r *http.Request) {
 		2. Call OVSClient API : countQuery(metric string) ([]TSMetricObj, error)
 		3. Marsha JSON
 	*/
+
 	w.Write([]byte(`{"message": "get called"}`))
 }
 
@@ -57,16 +57,15 @@ func getTopkAPIQuery(w http.ResponseWriter, r *http.Request) {
 	c, err := ovs_prom_client.NewOVSPClilent(HOST, PORT, VERSION)
 	pathParams := mux.Vars(r)
 	metricID := ""
-	durationID := ""
-	rankID := ""
+	durationID := -1
+	rankID := -1
 
 	if val, ok := pathParams[PARAMMETRIC]; ok {
-		metricID, err = strconv.Atoi(val)
-		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			w.Write([]byte(`{"message": "need a metric"}`))
-			return
-		}
+		metricID = val
+	} else {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(`{"message": "need a metric"}`))
+		return
 	}
 
 	if val, ok := pathParams[PARAMDURATION]; ok {
@@ -99,15 +98,14 @@ func getGroupbyAPIQueryRange(w http.ResponseWriter, r *http.Request) {
 	c, err := ovs_prom_client.NewOVSPClilent(HOST, PORT, VERSION)
 	pathParams := mux.Vars(r)
 	metricID := ""
-	durationID := ""
+	durationID := -1
 
 	if val, ok := pathParams[PARAMMETRIC]; ok {
-		metricID, err = strconv.Atoi(val)
-		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			w.Write([]byte(`{"message": "need a metric"}`))
-			return
-		}
+		metricID = val
+	} else {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(`{"message": "need a metric"}`))
+		return
 	}
 
 	if val, ok := pathParams[PARAMDURATION]; ok {

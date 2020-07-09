@@ -283,7 +283,8 @@ func groupbyAPIQueryRange(host string, port string, query string) ([]TSMetricObj
 	return queryResult, nil
 }
 
-func (c *OVSClient) ntopQueryWithRate(rankSize string, metric string, duration string) ([]TSMetricObj, error) {
+// NtopQueryWithRate is qeury for tonN method
+func (c *OVSClient) NtopQueryWithRate(rankSize string, metric string, duration string) ([]TSMetricObj, error) {
 	// Make Query String
 	query := fmt.Sprintf(ntopQueryWithRate, rankSize, metric, duration)
 
@@ -291,7 +292,8 @@ func (c *OVSClient) ntopQueryWithRate(rankSize string, metric string, duration s
 	return topkAPIQuery(c.Host, c.Port, query)
 }
 
-func (c *OVSClient) countQuery(metric string) ([]TSMetricObj, error) {
+// CountQuery is qeury for count method
+func (c *OVSClient) CountQuery(metric string) ([]TSMetricObj, error) {
 	// Make Query String
 	query := fmt.Sprintf(countQuery, metric)
 
@@ -299,7 +301,8 @@ func (c *OVSClient) countQuery(metric string) ([]TSMetricObj, error) {
 	return countAPIQuery(c.Host, c.Port, query)
 }
 
-func (c *OVSClient) avgbyQueryWithRate(metric string, duration string) ([]TSMetricObj, error) {
+// AvgbyQueryWithRate is qeury for range method
+func (c *OVSClient) AvgbyQueryWithRate(metric string, duration string) ([]TSMetricObj, error) {
 	// Make Query String
 	query := fmt.Sprintf(avgbyQueryWithRate, metric, duration)
 
