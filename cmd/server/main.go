@@ -79,7 +79,7 @@ func getTopkAPIQuery(w http.ResponseWriter, r *http.Request) {
 	c, err := ovs_prom_client.NewOVSPClilent(HOST, PORT, VERSION)
 	pathParams := mux.Vars(r)
 	metricID := ""
-	durationID := -1
+	durationID := ""
 	rankID := -1
 
 	if val, ok := pathParams[PARAMMETRIC]; ok {
@@ -91,7 +91,7 @@ func getTopkAPIQuery(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if val, ok := pathParams[PARAMDURATION]; ok {
-		durationID, err = strconv.Atoi(val)
+		durationID = val
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			w.Write([]byte(`{"message": "need a duration"}`))
@@ -137,7 +137,7 @@ func getGroupbyAPIQueryRange(w http.ResponseWriter, r *http.Request) {
 	c, err := ovs_prom_client.NewOVSPClilent(HOST, PORT, VERSION)
 	pathParams := mux.Vars(r)
 	metricID := ""
-	durationID := -1
+	durationID := ""
 
 	if val, ok := pathParams[PARAMMETRIC]; ok {
 		metricID = val
@@ -148,8 +148,7 @@ func getGroupbyAPIQueryRange(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if val, ok := pathParams[PARAMDURATION]; ok {
-		fmt.Printf("Debug duration :%v", val)
-		durationID, err = strconv.Atoi(val)
+		durationID = val
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			w.Write([]byte(`{"message": "need a duration"}`))
