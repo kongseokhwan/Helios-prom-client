@@ -40,7 +40,7 @@ const ovsInterfaceTransmitPacketTotal string = "ovs_interface_transmit_packeets_
 const ovsFlowByteTotal string = "ovs_flow_flow_bytes_total"
 const ovsFlowPacketTotal string = "ovs_flow_flow_packets_total"
 
-const ntopQueryWithRate string = "topk(%s, avg by (bridge, port)(rate(%s[%s])*8))" // rankSize, metric, duration
+const ntopQueryWithRate string = "topk(%d, avg by (bridge, port)(rate(%s[%s])*8))" // rankSize(int), metric, duration
 const countQuery string = "count(count by (bridge, port)(%s))"                     // metric
 const avgbyQueryWithRate string = "avg by(bridge, port) (rate(%s[%s])*8)"          // metric, duration
 
@@ -291,6 +291,8 @@ func (c *OVSClient) NtopQueryWithRate(rankSize int, metric string, duration stri
 	query := fmt.Sprintf(ntopQueryWithRate, rankSize, metric, duration)
 
 	fmt.Printf("Debug nTop : %s", query)
+	fmt.Printf("Debug nTop : %s", query)
+
 	// Call ovsAPIQueryRange() & return result
 	return topkAPIQuery(c.Host, c.Port, query)
 }
