@@ -63,9 +63,10 @@ func getCountAPIQuery(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	queryResult = &TSMetrics{Metrics: queryResult}
+	respObj := TSMetrics{}
+	respObj.Metrics = queryResult
 
-	resp, err := json.MarshalIndent(queryResult, "", "\t\t")
+	resp, err := json.MarshalIndent(&respObj, "", "\t\t")
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte(`{"message": "error to marshal JSON"}`))
@@ -123,7 +124,7 @@ func getTopkAPIQuery(w http.ResponseWriter, r *http.Request) {
 	respObj := TSMetrics{}
 	respObj.Metrics = queryResult
 
-	resp, err := json.MarshalIndent(&queryResult, "", "\t\t")
+	resp, err := json.MarshalIndent(&respObj, "", "\t\t")
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte(`{"message": "error to marshal JSON"}`))
@@ -167,9 +168,10 @@ func getGroupbyAPIQueryRange(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	queryResult = &TSMetrics{Metrics: queryResult}
+	respObj := TSMetrics{}
+	respObj.Metrics = queryResult
 
-	resp, err := json.MarshalIndent(queryResult, "", "\t\t")
+	resp, err := json.MarshalIndent(&respObj, "", "\t\t")
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte(`{"message": "error to marshal JSON"}`))
