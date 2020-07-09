@@ -290,6 +290,7 @@ func (c *OVSClient) NtopQueryWithRate(rankSize int, metric string, duration stri
 	// Make Query String
 	query := fmt.Sprintf(ntopQueryWithRate, rankSize, metric, duration)
 
+	fmt.Printf("Debug nTop : %s", query)
 	// Call ovsAPIQueryRange() & return result
 	return topkAPIQuery(c.Host, c.Port, query)
 }
