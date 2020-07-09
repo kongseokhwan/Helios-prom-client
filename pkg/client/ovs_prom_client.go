@@ -161,6 +161,8 @@ func countAPIQuery(host string, port string, query string) ([]TSMetricObj, error
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
+	fmt.Printf("Debug: querying %v\n", query)
+
 	result, warnings, err := v1api.Query(ctx, query, time.Now())
 	if err != nil {
 		fmt.Printf("Error querying Prometheus: %v\n", err)
