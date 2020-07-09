@@ -8,7 +8,7 @@ import (
 	"strconv"
 
 	"github.com/gorilla/mux"
-	ovs_prom_client "github.com/kongseokhwan/Helios-prom-client/client"
+	ovs_prom_client "github.com/kongseokhwan/Helios-prom-client/pkg/client"
 )
 
 // HOST is prometheus server IP
