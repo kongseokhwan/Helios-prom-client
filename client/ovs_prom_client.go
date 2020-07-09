@@ -284,7 +284,7 @@ func groupbyAPIQueryRange(host string, port string, query string) ([]TSMetricObj
 }
 
 // NtopQueryWithRate is qeury for tonN method
-func (c *OVSClient) NtopQueryWithRate(rankSize string, metric string, duration string) ([]TSMetricObj, error) {
+func (c *OVSClient) NtopQueryWithRate(rankSize int, metric string, duration int) ([]TSMetricObj, error) {
 	// Make Query String
 	query := fmt.Sprintf(ntopQueryWithRate, rankSize, metric, duration)
 
@@ -302,7 +302,7 @@ func (c *OVSClient) CountQuery(metric string) ([]TSMetricObj, error) {
 }
 
 // AvgbyQueryWithRate is qeury for range method
-func (c *OVSClient) AvgbyQueryWithRate(metric string, duration string) ([]TSMetricObj, error) {
+func (c *OVSClient) AvgbyQueryWithRate(metric string, duration int) ([]TSMetricObj, error) {
 	// Make Query String
 	query := fmt.Sprintf(avgbyQueryWithRate, metric, duration)
 
