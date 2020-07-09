@@ -41,7 +41,7 @@ const ovsFlowByteTotal string = "ovs_flow_flow_bytes_total"
 const ovsFlowPacketTotal string = "ovs_flow_flow_packets_total"
 
 const ntopQueryWithRate string = "topk(%s, avg by (bridge, port)(rate(%s[%s])*8))" // rankSize, metric, duration
-const countQuery string = "count(count by (bridge, port)(%s)"                      // metric
+const countQuery string = "count(count by (bridge, port)(%s))"                     // metric
 const avgbyQueryWithRate string = "avg by(bridge, port) (rate(%s[%s])*8)"          // metric, duration
 
 // TSMetricObj struct is response structutre of metric query
