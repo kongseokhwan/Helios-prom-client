@@ -148,6 +148,7 @@ func getGroupbyAPIQueryRange(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if val, ok := pathParams[PARAMDURATION]; ok {
+		fmt.Printf("Debug duration :%v", val)
 		durationID, err = strconv.Atoi(val)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
