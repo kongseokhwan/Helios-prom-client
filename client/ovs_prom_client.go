@@ -11,7 +11,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package v1_test provides examples making requests to Prometheus using the
+// Package ovs_prom_client provides examples making requests to Prometheus using the
 // Golang client.
 package ovs_prom_client
 
@@ -26,43 +26,44 @@ import (
 	"github.com/prometheus/common/log"
 )
 
-const OVS_INTERFACE_RECEIVE_BYTES_TOTAL string = "ovs_interface_receive_bytes_total"
-const OVS_INTERFACE_RECEIVE_CRC_TOTAL string = "ovs_interface_receive_crc_total"
-const OVS_INTERFACE_RECEIVE_DROP_TOTAL string = "ovs_interface_receive_drop_total"
-const OVS_INTERFACE_RECEIVE_ERRORS_TOTAL string = "ovs_interface_receive_errors_total"
-const OVS_INTERFACE_RECEIVE_PACKETS_TOTAL string = "ovs_interface_receive_packets_total"
-const OVS_INTERFACE_TRANSMIT_BYTES_TOTAL string = "ovs_interface_transmit_bytes_total"
-const OVS_INTERFACE_TRANSMIT_COLLISIONS_TOTAL string = "ovs_interface_transmit_collisionss_total"
-const OVS_INTERFACE_TRANSMIT_DROP_TOTAL string = "ovs_interface_transmit_drop_total"
-const OVS_INTERFACE_TRANSMIT_ERRORS_TOTAL string = "ovs_interface_transmit_errors_total"
-const OVS_INTERFACE_TRANSMIT_PACKETS_TOTAL string = "ovs_interface_transmit_packeets_total"
+const ovsInterfaceReceiveBytesTotal string = "ovs_interface_receive_bytes_total"
+const ovsInterfaceReceiveCrcTotal string = "ovs_interface_receive_crc_total"
+const ovsInterfaceReceiveDropTotal string = "ovs_interface_receive_drop_total"
+const ovsInterfaceReceiveErroTotal string = "ovs_interface_receive_errors_total"
+const ovsInterfaceReceivePacketTotal string = "ovs_interface_receive_packets_total"
+const ovsInterfaceTransmitByteTotal string = "ovs_interface_transmit_bytes_total"
+const ovsInterfaceTransmitCollisionTotal string = "ovs_interface_transmit_collisionss_total"
+const ovsInterfaceTransmitDropTotal string = "ovs_interface_transmit_drop_total"
+const ovsInterfaceTransmitErrorTotal string = "ovs_interface_transmit_errors_total"
+const ovsInterfaceTransmitPacketTotal string = "ovs_interface_transmit_packeets_total"
 
-const OVS_FLOW_FLOW_BYTES_TOTAL string = "ovs_flow_flow_bytes_total"
-const OVS_FLOW_FLOW_PACKETS_TOTAL string = "ovs_flow_flow_packets_total"
+const ovsFlowByteTotal string = "ovs_flow_flow_bytes_total"
+const ovsFlowPacketTotal string = "ovs_flow_flow_packets_total"
 
 const ntopQueryWithRate string = "topk(%s, avg by (bridge, port)(rate(%s[%s])*8))" // rankSize, metric, duration
 const countQuery string = "count(count by (bridge, port)(%s)"                      // metric
 const avgbyQueryWithRate string = "avg by(bridge, port) (rate(%s[%s])*8)"          // metric, duration
 
+// TSMetricObj struct is response structutre of metric query
 type TSMetricObj struct {
 	Label      string
 	Vals       []string
 	TimeSeries []string
 }
 
+// OVSClient struct is client for interconnection with prometheus server
 type OVSClient struct {
 	Host    string
-	Port    int
+	Port    string
 	Version string
 }
 
+// NewOVSPClilent returns an initialized Client.
 func NewOVSPClilent(host string, port string, version string) (*OVSClient, error) {
-	// TODO: opts validation check
-
 	c := OVSClient{
-		Host:    opts.Host,
-		Port:    opts.Port,
-		Version: opts.Version,
+		Host:    host,
+		Port:    port,
+		Version: version,
 	}
 
 	log.Debug("NewOVSPClilent() initialized successfully")
@@ -145,11 +146,11 @@ func parseGroupByMetric(res string) map[string][]string {
 	return metricMap
 }
 
-func countAPIQuery(host string, port int, query string) ([]TSMetricObj, error) {
+func countAPIQuery(host string, port string, query string) ([]TSMetricObj, error) {
 	var queryResult []TSMetricObj
 
 	client, err := api.NewClient(api.Config{
-		Address: fmt.Sprint("http://%s:%s", host, port),
+		Address: fmt.Sprintf("http://%s:%s", host, port),
 	})
 	if err != nil {
 		fmt.Printf("Error creating client: %v\n", err)
@@ -189,11 +190,11 @@ func countAPIQuery(host string, port int, query string) ([]TSMetricObj, error) {
 	return queryResult, err
 }
 
-func topkAPIQuery(host string, port int, query string) ([]TSMetricObj, error) {
+func topkAPIQuery(host string, port string, query string) ([]TSMetricObj, error) {
 	var queryResult []TSMetricObj
 
 	client, err := api.NewClient(api.Config{
-		Address: fmt.Sprint("http://%s:%s", host, port),
+		Address: fmt.Sprintf("http://%s:%s", host, port),
 	})
 	if err != nil {
 		fmt.Printf("Error creating client: %v\n", err)
@@ -234,11 +235,11 @@ func topkAPIQuery(host string, port int, query string) ([]TSMetricObj, error) {
 	return queryResult, nil
 }
 
-func groupbyAPIQueryRange(host string, port int, query string) ([]TSMetricObj, error) {
+func groupbyAPIQueryRange(host string, port string, query string) ([]TSMetricObj, error) {
 	var queryResult []TSMetricObj
 
 	client, err := api.NewClient(api.Config{
-		Address: fmt.Sprint("http://%s:%s", host, port),
+		Address: fmt.Sprintf("http://%s:%s", host, port),
 	})
 
 	if err != nil {

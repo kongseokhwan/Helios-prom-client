@@ -7,14 +7,25 @@ import (
 	"strconv"
 
 	"github.com/gorilla/mux"
+	ovs_prom_client "github.com/kongseokhwan/Helios-prom-client/client"
 )
 
+// HOST is prometheus server IP
 const HOST string = "15.165.203.82"
+
+// PORT is prometheus server PORT
 const PORT string = "9090"
+
+// VERSION is OVS Client API Version
 const VERSION string = "v1"
 
+// PARAMMETRIC is metric parameter
 const PARAMMETRIC string = "metricID"
+
+// PARAMRANK is rank parameter
 const PARAMRANK string = "rankID"
+
+// PARAMDURATION is duration parameter
 const PARAMDURATION string = "durationID"
 
 func getCountAPIQuery(w http.ResponseWriter, r *http.Request) {
